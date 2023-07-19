@@ -1,4 +1,4 @@
-from appfl.misc import get_executable_func
+from appfl.misc import get_executable_func, get_hf_model
 
 from appfl.funcx.cloud_storage import CloudStorage, LargeObjectWrapper
 import os.path as osp
@@ -13,9 +13,12 @@ def get_dataset(cfg, client_idx, mode='train'):
 
 def get_model(cfg):
     # Get training model
-    get_model = get_executable_func(cfg.get_model)
-    ModelClass = get_model()
-    model      = ModelClass(*cfg.model_args, **cfg.model_kwargs)
+    if cfg.hf_model_arc != '':
+        model = get_hf_model(cfg.hf_model_arc, cfg.hf_model_weights)
+    else:
+        get_model = get_executable_func(cfg.get_model)
+        ModelClass = get_model()
+        model      = ModelClass(*cfg.model_args, **cfg.model_kwargs)
     return model
 
 def load_global_state(cfg, global_state, temp_dir):
