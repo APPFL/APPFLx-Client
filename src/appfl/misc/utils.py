@@ -14,7 +14,6 @@ import copy
 import string
 import torch
 import pickle as pkl
-from huggingface_hub import hf_hub_download
 
 def get_executable_func(func_cfg):
     if func_cfg.module != "":
@@ -199,33 +198,3 @@ def load_source_file(file_path):
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-
-def get_hf_model(arc, weights):
-    # Split the full path into the repository part and the file part
-    arc_parts = arc.split("/", 2)
-    arc_repo = "/".join(arc_parts[:2])
-    arc_file = arc_parts[2]
-
-    weights_parts = weights.split("/", 2)
-    weights_repo = "/".join(weights_parts[:2])
-    weights_file = weights_parts[2]
-
-    # Download model architecture script and weights file from Hugging Face hub
-    arc_path = hf_hub_download(repo_id=arc_repo, filename=arc_file)
-    weights_path = hf_hub_download(repo_id=weights_repo, filename=weights_file)
-
-    # Define a dictionary to use for the exec function's global and local variables
-    exec_globals = {}
-
-    # Run the downloaded script to get the model architecture
-    with open(arc_path, 'r') as file:
-        exec(file.read(), exec_globals)
-
-    # Get the get_model function from the exec_globals dictionary
-    get_model = exec_globals['get_model']
-    model = get_model()
-
-    # Load the weights file into the model
-    model.load_state_dict(torch.load(weights_path))
-
-    return model
