@@ -21,6 +21,12 @@ def get_model(cfg):
         model      = ModelClass(*cfg.model_args, **cfg.model_kwargs)
     return model
 
+def get_loss(cfg):
+    print("===== get loss class =====")
+    LossClass = get_executable_func(cfg.get_loss)()
+    loss_fn = LossClass()
+    return loss_fn
+
 def load_global_state(cfg, global_state, temp_dir):
     if CloudStorage.is_cloud_storage_object(global_state):
         CloudStorage.init(cfg, temp_dir)
