@@ -22,7 +22,6 @@ def get_model(cfg):
     return model
 
 def get_loss(cfg):
-    print("===== get loss class =====")
     LossClass = get_executable_func(cfg.get_loss)()
     loss_fn = LossClass()
     return loss_fn
